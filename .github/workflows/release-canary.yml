@@ -82,10 +82,6 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      # https://github.com/yarnpkg/yarn/issues/6617#issuecomment-436222106
-      - name: Prepend Node path
-        run: npm config set scripts-prepend-node-path true
-
       - name: Set Verbose Logging
         run: npm config set loglevel verbose --global
 
