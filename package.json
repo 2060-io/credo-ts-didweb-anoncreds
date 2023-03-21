@@ -1,0 +1,75 @@
+{
+  "name": "aries-framework-didweb-anoncreds",
+  "version": "0.0.0.alpha-0",
+  "description": "did:web AnonCreds registry for aries-framework-javascript",
+  "author": "2060.io",
+  "homepage": "https://github.com/2060-io/aries-javascript-didweb-anoncreds",
+  "license": "ISC",
+  "main": "build/index.js",
+  "types": "build/index.js",
+  "files": [
+    "build"
+  ],
+  "scripts": {
+    "build": "yarn run clean && yarn run compile",
+    "clean": "rimraf -rf ./build",
+    "compile": "tsc -p tsconfig.build.json",
+    "prepublishOnly": "yarn run build",
+    "check-types": "tsc --noEmit -p tsconfig.build.json",
+    "check-format": "yarn prettier --check",
+    "prettier": "prettier --ignore-path .gitignore '**/*.+(js|json|ts|md|yml|yaml)'",
+    "release": "release-it"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/2060-io/aries-javascript-didweb-anoncreds"
+  },
+  "bugs": {
+    "url": "https://github.com/2060-io/aries-javascript-didweb-anoncreds/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "devDependencies": {
+    "@aries-framework/node": "^0.4.0-alpha.84",
+    "@types/jest": "^26.0.23",
+    "@types/uuid": "^9.0.0",
+    "@typescript-eslint/eslint-plugin": "^4.28.2",
+    "@typescript-eslint/parser": "^4.17.0",
+    "release-it": "^14.13.1",
+    "jest": "^27.0.4",
+    "prettier": "^2.2.1",
+    "ts-jest": "^27.0.3",
+    "ts-node": "^10.8.1",
+    "tsconfig-paths": "^3.10.1",
+    "typescript": "~4.9.5"
+  },
+  "dependencies": {
+    "@aries-framework/core": "^0.4.0-alpha.84",
+    "@aries-framework/anoncreds": "^0.4.0-alpha.84",
+    "class-transformer": "0.5.1",
+    "class-validator": "0.13.1",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.2.0",
+    "tsyringe": "^4.6.0",
+    "uuid": "^9.0.0"
+  },
+  "release-it": {
+    "github": {
+      "release": true
+    },
+    "npm": {
+      "skipChecks": true,
+      "ignoreVersion": true,
+      "tag": "latest"
+    },
+    "git": {
+      "push": false,
+      "commit": false,
+      "requireCommits": true,
+      "tagAnnotation": "${version}",
+      "requireBranch": "main"
+    }
+  }
+}

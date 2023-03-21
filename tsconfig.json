@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.build.json",
+  "ts-node": {
+    "require": ["tsconfig-paths/register"],
+    "files": true
+  },
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "aries-javascript-didweb-anoncreds/*": ["src"]
+    },
+    "types": ["jest", "node"],
+    "watch": true
+  },
+  "exclude": ["node_modules", "build"]
+}

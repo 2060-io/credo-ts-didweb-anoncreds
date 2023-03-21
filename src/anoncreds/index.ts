@@ -1,0 +1,1 @@
+export { DidWebAnonCredsRegistry } from './DidWebAnonCredsRegistry'
