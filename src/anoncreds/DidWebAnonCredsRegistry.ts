@@ -11,26 +11,58 @@ import {
   RegisterSchemaOptions,
   RegisterSchemaReturn,
 } from '@aries-framework/anoncreds'
-import { AgentContext, utils } from '@aries-framework/core'
-
-const DIDURLREGEXP = /^did:web:([_a-z0-9.%A-]*)\/([_a-z0-9-/]*)/
+import { AgentContext, DidsApi, utils } from '@aries-framework/core'
+import { parse } from 'did-resolver'
+import { parseUrl } from 'query-string'
 
 export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
   public readonly supportedIdentifier = /^did:web:[_a-z0-9.%A-]*/
+  private didsApi: DidsApi
+
+  public constructor(didsApi: DidsApi) {
+    this.didsApi = didsApi
+  }
+
+
+  private async parseIdAndGetResource(agentContext: AgentContext, objectId: string) {
+    const parsedDid = parse(objectId)
+
+    if (!parsedDid) {
+      throw new Error(`${objectId} is not a valid object identifier`)
+    }
+
+    if (parsedDid.method != 'web') {
+        throw new Error('DidWebAnonCredsRegistry only supports did:web identifiers')
+    }
+
+    const didDocument = await this.didsApi.resolveDidDocument(parsedDid.did)
+
+    const parsedUrl = parseUrl(objectId)
+    const queriedService = parsedUrl.query['service']
+    const relativeRef = parsedUrl.query['relativeRef']
+
+    if (!queriedService || Array.isArray(queriedService)) {
+      throw new Error('No valid service query present in the ID')
+    }
+
+    if (!relativeRef || Array.isArray(relativeRef)) {
+      throw new Error('No valid relativeRef query present in the ID')
+    }
+
+    const baseEndpoint = didDocument.service?.find(service => service.id === `${parsedDid.did}#${queriedService}`)?.serviceEndpoint
+
+    if (!baseEndpoint) {
+      throw new Error(`No valid endpoint has been found for the service ${queriedService}`)
+    }
+
+    const fetchObjectUrl = `${baseEndpoint}${relativeRef}`
+    agentContext.config.logger.debug(`getting AnonCreds object at URL: ${fetchObjectUrl}`)
+    return await agentContext.config.agentDependencies.fetch(fetchObjectUrl, {"method": "GET"})
+  }
 
   public async getSchema(agentContext: AgentContext, schemaId: string): Promise<GetSchemaReturn> {
-    const match = schemaId.match(DIDURLREGEXP)
-
-    if (match) {
-      const [, domain, path] = match
-
-      agentContext.config.logger.debug(
-        `getting schema from URL: https://${domain.replace('%3A', ':')}/.well-known/${path}`
-      )
-      const response = await agentContext.config.agentDependencies.fetch(
-        `https://${domain.replace('%3A', ':')}/.well-known/${path}`
-      )
-
+    try {
+      const response = await this.parseIdAndGetResource(agentContext, schemaId)
       if (response.status === 200) {
         return {
           schemaId,
@@ -46,7 +78,7 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
           schemaId,
         }
       }
-    } else {
+    } catch (error) {
       return {
         resolutionMetadata: { error: 'invalid' },
         schemaMetadata: {},
@@ -60,8 +92,7 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
     options: RegisterSchemaOptions
   ): Promise<RegisterSchemaReturn> {
     // Nothing to actually do other than generating a schema id
-    const schemaId = `${options.schema.issuerId}/anoncreds/v1/schemas/${utils.uuid()}`
-
+    const schemaId = `${options.schema.issuerId}?service=anoncreds&relativeRef=/schema/${utils.uuid()}`
     return {
       schemaState: { state: 'finished', schema: options.schema, schemaId },
       registrationMetadata: {},
@@ -73,18 +104,8 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
     agentContext: AgentContext,
     credentialDefinitionId: string
   ): Promise<GetCredentialDefinitionReturn> {
-    const match = credentialDefinitionId.match(DIDURLREGEXP)
-
-    if (match) {
-      const [, domain, path] = match
-
-      agentContext.config.logger.debug(
-        `getting credential definition from URL: https://${domain.replace('%3A', ':')}/.well-known/${path}`
-      )
-      const response = await agentContext.config.agentDependencies.fetch(
-        `https://${domain.replace('%3A', ':')}/.well-known/${path}`
-      )
-
+    try {
+      const response = await this.parseIdAndGetResource(agentContext, credentialDefinitionId)
       if (response.status === 200) {
         return {
           credentialDefinitionId,
@@ -93,13 +114,14 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
           resolutionMetadata: {},
         }
       } else {
+        agentContext.config.logger.debug(`response: ${response.status}`)
         return {
           resolutionMetadata: { error: 'notFound' },
           credentialDefinitionMetadata: {},
           credentialDefinitionId,
         }
       }
-    } else {
+    } catch (error) {
       return {
         resolutionMetadata: { error: 'invalid' },
         credentialDefinitionMetadata: {},
@@ -115,7 +137,7 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
     // Nothing to actually do other than generating a credential definition id
     const credentialDefinitionId = `${
       options.credentialDefinition.issuerId
-    }/anoncreds/v1/credential-definitions/${utils.uuid()}`
+    }?service=anoncreds&relativeRef=/credDef/${utils.uuid()}`
 
     return {
       credentialDefinitionState: {
