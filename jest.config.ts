@@ -2,13 +2,7 @@ import type { Config } from '@jest/types'
 
 import packageJson from './package.json'
 
-const esModules = [
-  'query-string',
-  'decode-uri-component',
-  'split-on-first',
-  'filter-obj',
-];
-
+const esModules = ['query-string', 'decode-uri-component', 'split-on-first', 'filter-obj']
 
 const config: Config.InitialOptions = {
   preset: 'ts-jest',
@@ -20,12 +14,7 @@ const config: Config.InitialOptions = {
   name: packageJson.name,
   displayName: packageJson.name,
   testTimeout: 15000,
-  moduleFileExtensions: [
-    "ts",
-    "tsx",
-    "js",
-    "jsx"
-  ],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   transformIgnorePatterns: esModules.length ? [`/node_modules/(?!${esModules.join('|')})`] : [],
 }
 

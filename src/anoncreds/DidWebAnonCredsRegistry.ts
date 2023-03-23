@@ -23,7 +23,6 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
     this.didsApi = didsApi
   }
 
-
   private async parseIdAndGetResource(agentContext: AgentContext, objectId: string) {
     const parsedDid = parse(objectId)
 
@@ -32,7 +31,7 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
     }
 
     if (parsedDid.method != 'web') {
-        throw new Error('DidWebAnonCredsRegistry only supports did:web identifiers')
+      throw new Error('DidWebAnonCredsRegistry only supports did:web identifiers')
     }
 
     const didDocument = await this.didsApi.resolveDidDocument(parsedDid.did)
@@ -49,7 +48,9 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
       throw new Error('No valid relativeRef query present in the ID')
     }
 
-    const baseEndpoint = didDocument.service?.find(service => service.id === `${parsedDid.did}#${queriedService}`)?.serviceEndpoint
+    const baseEndpoint = didDocument.service?.find(
+      (service) => service.id === `${parsedDid.did}#${queriedService}`
+    )?.serviceEndpoint
 
     if (!baseEndpoint) {
       throw new Error(`No valid endpoint has been found for the service ${queriedService}`)
@@ -57,7 +58,7 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
 
     const fetchObjectUrl = `${baseEndpoint}${relativeRef}`
     agentContext.config.logger.debug(`getting AnonCreds object at URL: ${fetchObjectUrl}`)
-    return await agentContext.config.agentDependencies.fetch(fetchObjectUrl, {"method": "GET"})
+    return await agentContext.config.agentDependencies.fetch(fetchObjectUrl, { method: 'GET' })
   }
 
   public async getSchema(agentContext: AgentContext, schemaId: string): Promise<GetSchemaReturn> {
