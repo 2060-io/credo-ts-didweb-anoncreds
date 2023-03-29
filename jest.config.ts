@@ -2,6 +2,8 @@ import type { Config } from '@jest/types'
 
 import packageJson from './package.json'
 
+const esModules = ['query-string', 'decode-uri-component', 'split-on-first', 'filter-obj']
+
 const config: Config.InitialOptions = {
   preset: 'ts-jest',
   testEnvironment: 'node',
@@ -11,8 +13,9 @@ const config: Config.InitialOptions = {
   testMatch: ['**/?(*.)+(spec|test).[tj]s?(x)'],
   name: packageJson.name,
   displayName: packageJson.name,
-  setupFilesAfterEnv: ['./test/setup.ts'],
   testTimeout: 15000,
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
+  transformIgnorePatterns: esModules.length ? [`/node_modules/(?!${esModules.join('|')})`] : [],
 }
 
 export default config

@@ -5,10 +5,7 @@
   },
   "compilerOptions": {
     "baseUrl": ".",
-    "paths": {
-      "@2060-agent-sdk/*": ["packages/*/src"]
-    },
     "types": ["jest", "node"]
   },
-  "include": ["test", "samples"]
+  "include": ["test"]
 }
