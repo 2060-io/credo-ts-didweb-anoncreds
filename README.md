@@ -2,7 +2,6 @@
 
 AnonCreds did:web method registry for [aries-framework-javascript](https://github.com/hyperledger/aries-framework-javascript).
 
-
 Based on current draft spec being written in this [HackMD document](https://hackmd.io/dzK5FbIsSkGlfnLPF_hAeQ).
 
 ## Usage
@@ -19,8 +18,8 @@ const agent = new Agent({
   dependencies,
   modules: {
     /* ... */
-    anoncreds: new AnonCredsModule({ registries: [ 
-        /* ... */ 
+    anoncreds: new AnonCredsModule({ registries: [
+        /* ... */
       new DidWebAnonCredsRegistry()
     ] }),
 })
