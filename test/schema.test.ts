@@ -17,11 +17,13 @@ import fetch, { Response } from 'node-fetch'
 
 jest.mock('@aries-framework/core/build/modules/dids/DidsApi')
 const DidsApiMock = DidsApi as jest.Mock<DidsApi>
+const didsApiMock = new DidsApiMock()
 
 function getAgentContext() {
   const dependencyManager = new DependencyManager()
 
   dependencyManager.registerInstance(AgentConfig, new AgentConfig({ label: 'mock' }, agentDependencies))
+  dependencyManager.registerInstance(DidsApi, didsApiMock)
   const agentContext = new AgentContext({ dependencyManager, contextCorrelationId: 'mock' })
 
   agentContext.config
@@ -33,10 +35,9 @@ describe('Schema', () => {
     //@ts-ignore
     fetch.mockReturnValueOnce(Promise.resolve(new Response(JSON.stringify(didDocument1))))
 
-    const didsApiMock = new DidsApiMock()
     jest.spyOn(didsApiMock, 'resolveDidDocument').mockResolvedValue(JsonTransformer.fromJSON(didDocument1, DidDocument))
 
-    const registry = new DidWebAnonCredsRegistry(didsApiMock)
+    const registry = new DidWebAnonCredsRegistry()
 
     const schemaResponse = await registry.getSchema(
       getAgentContext(),

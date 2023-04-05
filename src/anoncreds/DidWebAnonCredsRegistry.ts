@@ -23,11 +23,6 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
   public readonly methodName = 'web'
 
   public readonly supportedIdentifier = /^did:web:[_a-z0-9.%A-]*/
-  private didsApi: DidsApi
-
-  public constructor(didsApi: DidsApi) {
-    this.didsApi = didsApi
-  }
 
   public async getSchema(agentContext: AgentContext, schemaId: string): Promise<GetSchemaReturn> {
     try {
@@ -230,7 +225,8 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
       throw new Error('DidWebAnonCredsRegistry only supports did:web identifiers')
     }
 
-    const didDocument = await this.didsApi.resolveDidDocument(parsedDid.did)
+    const didsApi = agentContext.dependencyManager.resolve(DidsApi)
+    const didDocument = await didsApi.resolveDidDocument(parsedDid.did)
 
     const parsedUrl = parseUrl(didUrl)
     const queriedService = parsedUrl.query['service']
