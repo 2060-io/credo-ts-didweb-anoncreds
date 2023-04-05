@@ -20,6 +20,8 @@ import { AnonCredsObjectResolutionResult } from './AnonCredsObjectResolutionResu
 import { calculateObjectId, verifyObjectId } from './utils'
 
 export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
+  public readonly methodName = 'web'
+
   public readonly supportedIdentifier = /^did:web:[_a-z0-9.%A-]*/
   private didsApi: DidsApi
 
