@@ -16,8 +16,8 @@ import {
 import { AgentContext, DidsApi } from '@aries-framework/core'
 import { parse } from 'did-resolver'
 import { parseUrl } from 'query-string'
-import { AnonCredsObjectResolutionResult } from './AnonCredsObjectResolutionResult'
-import { calculateObjectId, verifyObjectId } from './utils'
+import { AnonCredsResourceResolutionResult } from './AnonCredsResourceResolutionResult'
+import { calculateResourceId, verifyResourceId } from './utils'
 
 export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
   public readonly methodName = 'web'
@@ -26,14 +26,14 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
 
   public async getSchema(agentContext: AgentContext, schemaId: string): Promise<GetSchemaReturn> {
     try {
-      const { response, objectId } = await this.parseIdAndFetchObject(agentContext, schemaId)
+      const { response, resourceId } = await this.parseIdAndFetchResource(agentContext, schemaId)
 
       if (response.status === 200) {
-        const result = (await response.json()) as AnonCredsObjectResolutionResult
-        const schema = result.object as unknown as AnonCredsSchema
-        const schemaMetadata = result.objectMetadata
-        if (!verifyObjectId(schema, objectId)) {
-          throw new Error('Wrong object Id')
+        const result = (await response.json()) as AnonCredsResourceResolutionResult
+        const schema = result.resource as unknown as AnonCredsSchema
+        const schemaMetadata = result.resourceMetadata
+        if (!verifyResourceId(schema, resourceId)) {
+          throw new Error('Wrong resource Id')
         }
 
         return {
@@ -64,9 +64,9 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
     options: RegisterSchemaOptions
   ): Promise<RegisterSchemaReturn> {
     // Nothing to actually do other than generating a schema id
-    const objectId = calculateObjectId(options.schema)
+    const resourceId = calculateResourceId(options.schema)
 
-    const schemaId = `${options.schema.issuerId}?service=anoncreds&relativeRef=/schema/${objectId}`
+    const schemaId = `${options.schema.issuerId}?service=anoncreds&relativeRef=/schema/${resourceId}`
     return {
       schemaState: { state: 'finished', schema: options.schema, schemaId },
       registrationMetadata: {},
@@ -79,14 +79,14 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
     credentialDefinitionId: string
   ): Promise<GetCredentialDefinitionReturn> {
     try {
-      const { response, objectId } = await this.parseIdAndFetchObject(agentContext, credentialDefinitionId)
+      const { response, resourceId } = await this.parseIdAndFetchResource(agentContext, credentialDefinitionId)
       if (response.status === 200) {
-        const result = (await response.json()) as AnonCredsObjectResolutionResult
-        const credentialDefinition = result.object as unknown as AnonCredsCredentialDefinition
-        const credentialDefinitionMetadata = result.objectMetadata
+        const result = (await response.json()) as AnonCredsResourceResolutionResult
+        const credentialDefinition = result.resource as unknown as AnonCredsCredentialDefinition
+        const credentialDefinitionMetadata = result.resourceMetadata
 
-        if (!verifyObjectId(credentialDefinition, objectId)) {
-          throw new Error('Wrong object Id')
+        if (!verifyResourceId(credentialDefinition, resourceId)) {
+          throw new Error('Wrong resource Id')
         }
 
         return {
@@ -117,9 +117,9 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
     options: RegisterCredentialDefinitionOptions
   ): Promise<RegisterCredentialDefinitionReturn> {
     // Nothing to actually do other than generating a credential definition id
-    const objectId = calculateObjectId(options.credentialDefinition)
+    const resourceId = calculateResourceId(options.credentialDefinition)
 
-    const credentialDefinitionId = `${options.credentialDefinition.issuerId}?service=anoncreds&relativeRef=/credDef/${objectId}`
+    const credentialDefinitionId = `${options.credentialDefinition.issuerId}?service=anoncreds&relativeRef=/credDef/${resourceId}`
 
     return {
       credentialDefinitionState: {
@@ -137,14 +137,14 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
     revocationRegistryDefinitionId: string
   ): Promise<GetRevocationRegistryDefinitionReturn> {
     try {
-      const { response, objectId } = await this.parseIdAndFetchObject(agentContext, revocationRegistryDefinitionId)
+      const { response, resourceId } = await this.parseIdAndFetchResource(agentContext, revocationRegistryDefinitionId)
       if (response.status === 200) {
-        const result = (await response.json()) as AnonCredsObjectResolutionResult
-        const revocationRegistryDefinition = result.object as unknown as AnonCredsRevocationRegistryDefinition
-        const revocationRegistryDefinitionMetadata = result.objectMetadata
+        const result = (await response.json()) as AnonCredsResourceResolutionResult
+        const revocationRegistryDefinition = result.resource as unknown as AnonCredsRevocationRegistryDefinition
+        const revocationRegistryDefinitionMetadata = result.resourceMetadata
 
-        if (!verifyObjectId(revocationRegistryDefinition, objectId)) {
-          throw new Error('Wrong object Id')
+        if (!verifyResourceId(revocationRegistryDefinition, resourceId)) {
+          throw new Error('Wrong resource Id')
         }
 
         return {
@@ -190,9 +190,9 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
       })
 
       if (response.status === 200) {
-        const result = (await response.json()) as AnonCredsObjectResolutionResult
-        const revocationStatusList = result.object as unknown as AnonCredsRevocationStatusList
-        const revocationStatusListMetadata = result.objectMetadata
+        const result = (await response.json()) as AnonCredsResourceResolutionResult
+        const revocationStatusList = result.resource as unknown as AnonCredsRevocationStatusList
+        const revocationStatusListMetadata = result.resourceMetadata
 
         return {
           revocationStatusList,
@@ -214,11 +214,11 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
     }
   }
 
-  private async parseIdAndFetchObject(agentContext: AgentContext, didUrl: string) {
+  private async parseIdAndFetchResource(agentContext: AgentContext, didUrl: string) {
     const parsedDid = parse(didUrl)
 
     if (!parsedDid) {
-      throw new Error(`${didUrl} is not a valid object identifier`)
+      throw new Error(`${didUrl} is not a valid resource identifier`)
     }
 
     if (parsedDid.method != 'web') {
@@ -240,11 +240,11 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
       throw new Error('No valid relativeRef query present in the ID')
     }
 
-    // The last segment of relativeRef is the objectId
-    const objectId = relativeRef.split('/').pop()
+    // The last segment of relativeRef is the resourceId
+    const resourceId = relativeRef.split('/').pop()
 
-    if (!objectId) {
-      throw new Error('Could not get objectId from relativeRef')
+    if (!resourceId) {
+      throw new Error('Could not get resourceId from relativeRef')
     }
 
     const baseEndpoint = didDocument.service?.find(
@@ -255,8 +255,11 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
       throw new Error(`No valid endpoint has been found for the service ${queriedService}`)
     }
 
-    const fetchObjectUrl = `${baseEndpoint}${relativeRef}`
-    agentContext.config.logger.debug(`getting AnonCreds object at URL: ${fetchObjectUrl}`)
-    return { response: await agentContext.config.agentDependencies.fetch(fetchObjectUrl, { method: 'GET' }), objectId }
+    const fetchResourceUrl = `${baseEndpoint}${relativeRef}`
+    agentContext.config.logger.debug(`getting AnonCreds resource at URL: ${fetchResourceUrl}`)
+    return {
+      response: await agentContext.config.agentDependencies.fetch(fetchResourceUrl, { method: 'GET' }),
+      resourceId,
+    }
   }
 }

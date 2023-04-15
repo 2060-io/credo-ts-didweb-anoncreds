@@ -1,16 +1,16 @@
 import { TypedArrayEncoder, Hasher } from '@aries-framework/core'
 import canonicalize from 'canonicalize'
 
-export function calculateObjectId(objectValue: unknown) {
-  const objectString = canonicalize(objectValue)
+export function calculateResourceId(resourceObjectValue: unknown) {
+  const objectString = canonicalize(resourceObjectValue)
 
   if (!objectString) {
-    throw new Error('Cannot canonicalize object')
+    throw new Error('Cannot canonicalize resource object')
   }
 
   return TypedArrayEncoder.toBase58(Hasher.hash(TypedArrayEncoder.fromString(objectString), 'sha2-256'))
 }
 
-export function verifyObjectId(objectValue: unknown, objectId: string) {
-  return calculateObjectId(objectValue) === objectId
+export function verifyResourceId(resourceObjectValue: unknown, resourceId: string) {
+  return calculateResourceId(resourceObjectValue) === resourceId
 }
