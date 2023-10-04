@@ -2,7 +2,7 @@
 
 AnonCreds did:web method registry for [aries-framework-javascript](https://github.com/hyperledger/aries-framework-javascript).
 
-Based on current draft spec being written in this [HackMD document](https://hackmd.io/dzK5FbIsSkGlfnLPF_hAeQ).
+Based on current draft spec being written in this [repo](https://github.com/2060-io/did-web-anoncreds-method).
 
 ## Usage
 
