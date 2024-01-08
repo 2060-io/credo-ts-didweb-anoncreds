@@ -42,7 +42,7 @@
     "jest": "^27.0.4",
     "node-fetch": "^2.6.4",
     "prettier": "^2.2.1",
-    "release-it": "^14.13.1",
+    "release-it": "^17.0.1",
     "ts-jest": "^27.0.3",
     "ts-node": "^10.8.1",
     "tsconfig-paths": "^3.10.1",
