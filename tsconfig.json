@@ -9,8 +9,7 @@
     "paths": {
       "aries-javascript-didweb-anoncreds/*": ["src"]
     },
-    "types": ["jest", "node"],
-    "watch": true
+    "types": ["jest", "node"]
   },
   "exclude": ["node_modules", "build"]
 }

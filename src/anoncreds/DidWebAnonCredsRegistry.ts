@@ -10,6 +10,10 @@ import {
   GetSchemaReturn,
   RegisterCredentialDefinitionOptions,
   RegisterCredentialDefinitionReturn,
+  RegisterRevocationRegistryDefinitionOptions,
+  RegisterRevocationRegistryDefinitionReturn,
+  RegisterRevocationStatusListOptions,
+  RegisterRevocationStatusListReturn,
   RegisterSchemaOptions,
   RegisterSchemaReturn,
 } from '@aries-framework/anoncreds'
@@ -51,6 +55,7 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
         }
       }
     } catch (error) {
+      console.log(`error: ${error}`)
       return {
         resolutionMetadata: { error: 'invalid' },
         schemaMetadata: {},
@@ -170,6 +175,26 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
     }
   }
 
+  public async registerRevocationRegistryDefinition(
+    agentContext: AgentContext,
+    options: RegisterRevocationRegistryDefinitionOptions
+  ): Promise<RegisterRevocationRegistryDefinitionReturn> {
+    // Nothing to actually do other than generating a revocation registry definition id
+    const resourceId = calculateResourceId(options.revocationRegistryDefinition)
+
+    const revocationRegistryDefinitionId = `${options.revocationRegistryDefinition.issuerId}?service=anoncreds&relativeRef=/revRegDef/${resourceId}`
+
+    return {
+      revocationRegistryDefinitionState: {
+        state: 'finished',
+        revocationRegistryDefinition: options.revocationRegistryDefinition,
+        revocationRegistryDefinitionId,
+      },
+      registrationMetadata: {},
+      revocationRegistryDefinitionMetadata: {},
+    }
+  }
+
   public async getRevocationStatusList(
     agentContext: AgentContext,
     revocationRegistryId: string,
@@ -211,6 +236,32 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
         resolutionMetadata: { error: 'invalid' },
         revocationStatusListMetadata: {},
       }
+    }
+  }
+
+  public async registerRevocationStatusList(
+    agentContext: AgentContext,
+    options: RegisterRevocationStatusListOptions
+  ): Promise<RegisterRevocationStatusListReturn> {
+    // Nothing to actually do other than adding a timestamp
+    const timestamp = Math.floor(new Date().getTime() / 1000)
+    const latestRevocationStatusList = await this.getRevocationStatusList(
+      agentContext,
+      options.revocationStatusList.revRegDefId,
+      timestamp
+    )
+
+    return {
+      revocationStatusListState: {
+        state: 'finished',
+        revocationStatusList: { ...options.revocationStatusList, timestamp },
+        timestamp: timestamp.toString(),
+      },
+      registrationMetadata: {},
+      revocationStatusListMetadata: {
+        previousVersionId: latestRevocationStatusList.revocationStatusList?.timestamp.toString() || '',
+        nextVersionId: '',
+      },
     }
   }
 
