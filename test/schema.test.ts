@@ -1,14 +1,14 @@
-import { AgentConfig, AgentContext, DependencyManager, DidDocument, JsonTransformer } from '@aries-framework/core'
-import { agentDependencies } from '@aries-framework/node'
+import { AgentConfig, AgentContext, DependencyManager, DidDocument, JsonTransformer } from '@credo-ts/core'
+import { agentDependencies } from '@credo-ts/node'
 import { DidWebAnonCredsRegistry } from '../src/anoncreds'
 import didDocument1 from './__fixtures__/did1.json'
 
-import { DidsApi } from '@aries-framework/core/build/modules/dids/DidsApi'
+import { DidsApi } from '@credo-ts/core/build/modules/dids/DidsApi'
 
 jest.mock('node-fetch')
 import fetch, { Response } from 'node-fetch'
 
-jest.mock('@aries-framework/core/build/modules/dids/DidsApi')
+jest.mock('@credo-ts/core/build/modules/dids/DidsApi')
 const DidsApiMock = DidsApi as jest.Mock<DidsApi>
 const didsApiMock = new DidsApiMock()
 

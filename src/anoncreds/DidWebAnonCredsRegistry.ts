@@ -16,8 +16,8 @@ import {
   RegisterRevocationStatusListReturn,
   RegisterSchemaOptions,
   RegisterSchemaReturn,
-} from '@aries-framework/anoncreds'
-import { AgentContext, DidsApi } from '@aries-framework/core'
+} from '@credo-ts/anoncreds'
+import { AgentContext, DidsApi } from '@credo-ts/core'
 import { parse } from 'did-resolver'
 import { parseUrl } from 'query-string'
 import { AnonCredsResourceResolutionResult } from './AnonCredsResourceResolutionResult'
@@ -255,7 +255,6 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
       revocationStatusListState: {
         state: 'finished',
         revocationStatusList: { ...options.revocationStatusList, timestamp },
-        timestamp: timestamp.toString(),
       },
       registrationMetadata: {},
       revocationStatusListMetadata: {

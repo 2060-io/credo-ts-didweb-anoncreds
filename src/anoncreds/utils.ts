@@ -1,4 +1,4 @@
-import { TypedArrayEncoder, Hasher } from '@aries-framework/core'
+import { TypedArrayEncoder, Hasher } from '@credo-ts/core'
 import canonicalize from 'canonicalize'
 
 export function calculateResourceId(resourceObjectValue: unknown) {
