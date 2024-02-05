@@ -8,7 +8,7 @@ export function calculateResourceId(resourceObjectValue: unknown) {
     throw new Error('Cannot canonicalize resource object')
   }
 
-  return TypedArrayEncoder.toBase58(Hasher.hash(TypedArrayEncoder.fromString(objectString), 'sha2-256'))
+  return TypedArrayEncoder.toBase58(Hasher.hash(TypedArrayEncoder.fromString(objectString), 'sha-256'))
 }
 
 export function verifyResourceId(resourceObjectValue: unknown, resourceId: string) {
