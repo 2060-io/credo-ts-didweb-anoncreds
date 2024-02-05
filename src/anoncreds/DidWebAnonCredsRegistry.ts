@@ -147,7 +147,6 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
       }
     }
 
-
     try {
       const { response, resourceId } = await this.parseIdAndFetchResource(agentContext, credentialDefinitionId)
       if (response.status === 200) {
