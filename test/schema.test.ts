@@ -31,7 +31,7 @@ describe.skip('Schema', () => {
 
     jest.spyOn(didsApiMock, 'resolveDidDocument').mockResolvedValue(JsonTransformer.fromJSON(didDocument1, DidDocument))
 
-    const registry = new DidWebAnonCredsRegistry()
+    const registry = new DidWebAnonCredsRegistry({})
 
     const schemaResponse = await registry.getSchema(
       getAgentContext(),

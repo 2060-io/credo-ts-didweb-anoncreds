@@ -17,18 +17,48 @@ import {
   RegisterSchemaOptions,
   RegisterSchemaReturn,
 } from '@credo-ts/anoncreds'
-import { AgentContext, DidsApi } from '@credo-ts/core'
+import { AgentContext, CacheModuleConfig, DidsApi } from '@credo-ts/core'
 import { parse } from 'did-resolver'
 import { parseUrl } from 'query-string'
 import { AnonCredsResourceResolutionResult } from './AnonCredsResourceResolutionResult'
 import { calculateResourceId, verifyResourceId } from './utils'
+
+export interface CacheSettings {
+  allowCaching: boolean
+  cacheDurationInSeconds: number
+}
 
 export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
   public readonly methodName = 'web'
 
   public readonly supportedIdentifier = /^did:web:[_a-z0-9.%A-]*/
 
+  private cacheSettings: CacheSettings
+
+  public constructor(options: { cacheOptions?: CacheSettings }) {
+    this.cacheSettings = options.cacheOptions ?? { allowCaching: true, cacheDurationInSeconds: 300 }
+  }
+
   public async getSchema(agentContext: AgentContext, schemaId: string): Promise<GetSchemaReturn> {
+    const cacheKey = `anoncreds:schema:${schemaId}`
+
+    if (this.cacheSettings.allowCaching) {
+      const cache = agentContext.dependencyManager.resolve(CacheModuleConfig).cache
+
+      const cachedObject = await cache.get<GetSchemaReturn>(agentContext, cacheKey)
+
+      if (cachedObject) {
+        return {
+          schema: cachedObject.schema,
+          schemaId,
+          schemaMetadata: cachedObject.schemaMetadata,
+          resolutionMetadata: {
+            ...cachedObject.resolutionMetadata,
+            servedFromCache: true,
+          },
+        }
+      }
+    }
     try {
       const { response, resourceId } = await this.parseIdAndFetchResource(agentContext, schemaId)
 
@@ -38,6 +68,20 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
         const schemaMetadata = result.resourceMetadata
         if (!verifyResourceId(schema, resourceId)) {
           throw new Error('Wrong resource Id')
+        }
+
+        if (this.cacheSettings.allowCaching) {
+          const cache = agentContext.dependencyManager.resolve(CacheModuleConfig).cache
+          await cache.set(
+            agentContext,
+            cacheKey,
+            {
+              resolutionMetadata: {},
+              schema,
+              schemaMetadata,
+            },
+            this.cacheSettings.cacheDurationInSeconds
+          )
         }
 
         return {
@@ -55,7 +99,7 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
         }
       }
     } catch (error) {
-      console.log(`error: ${error}`)
+      agentContext.config.logger.debug(`error: ${error}`)
       return {
         resolutionMetadata: { error: 'invalid' },
         schemaMetadata: {},
@@ -83,6 +127,27 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
     agentContext: AgentContext,
     credentialDefinitionId: string
   ): Promise<GetCredentialDefinitionReturn> {
+    const cacheKey = `anoncreds:credentialDefinition:${credentialDefinitionId}`
+
+    if (this.cacheSettings.allowCaching) {
+      const cache = agentContext.dependencyManager.resolve(CacheModuleConfig).cache
+
+      const cachedObject = await cache.get<GetCredentialDefinitionReturn>(agentContext, cacheKey)
+
+      if (cachedObject) {
+        return {
+          credentialDefinition: cachedObject.credentialDefinition,
+          credentialDefinitionId,
+          credentialDefinitionMetadata: cachedObject.credentialDefinitionMetadata,
+          resolutionMetadata: {
+            ...cachedObject.resolutionMetadata,
+            servedFromCache: true,
+          },
+        }
+      }
+    }
+
+
     try {
       const { response, resourceId } = await this.parseIdAndFetchResource(agentContext, credentialDefinitionId)
       if (response.status === 200) {
@@ -92,6 +157,20 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
 
         if (!verifyResourceId(credentialDefinition, resourceId)) {
           throw new Error('Wrong resource Id')
+        }
+
+        if (this.cacheSettings.allowCaching) {
+          const cache = agentContext.dependencyManager.resolve(CacheModuleConfig).cache
+          await cache.set(
+            agentContext,
+            cacheKey,
+            {
+              resolutionMetadata: {},
+              credentialDefinition,
+              credentialDefinitionMetadata,
+            },
+            this.cacheSettings.cacheDurationInSeconds
+          )
         }
 
         return {
@@ -141,6 +220,26 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
     agentContext: AgentContext,
     revocationRegistryDefinitionId: string
   ): Promise<GetRevocationRegistryDefinitionReturn> {
+    const cacheKey = `anoncreds:revocationRegistryDefinition:${revocationRegistryDefinitionId}`
+
+    if (this.cacheSettings.allowCaching) {
+      const cache = agentContext.dependencyManager.resolve(CacheModuleConfig).cache
+
+      const cachedObject = await cache.get<GetRevocationRegistryDefinitionReturn>(agentContext, cacheKey)
+
+      if (cachedObject) {
+        return {
+          revocationRegistryDefinition: cachedObject.revocationRegistryDefinition,
+          revocationRegistryDefinitionId,
+          revocationRegistryDefinitionMetadata: cachedObject.revocationRegistryDefinitionMetadata,
+          resolutionMetadata: {
+            ...cachedObject.resolutionMetadata,
+            servedFromCache: true,
+          },
+        }
+      }
+    }
+
     try {
       const { response, resourceId } = await this.parseIdAndFetchResource(agentContext, revocationRegistryDefinitionId)
       if (response.status === 200) {
@@ -150,6 +249,20 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
 
         if (!verifyResourceId(revocationRegistryDefinition, resourceId)) {
           throw new Error('Wrong resource Id')
+        }
+
+        if (this.cacheSettings.allowCaching) {
+          const cache = agentContext.dependencyManager.resolve(CacheModuleConfig).cache
+          await cache.set(
+            agentContext,
+            cacheKey,
+            {
+              resolutionMetadata: {},
+              revocationRegistryDefinition,
+              revocationRegistryDefinitionMetadata,
+            },
+            this.cacheSettings.cacheDurationInSeconds
+          )
         }
 
         return {
