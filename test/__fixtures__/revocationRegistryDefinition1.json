@@ -1,0 +1,16 @@
+{
+  "issuerId": "did:web:ca.dev.2060.io",
+  "revocDefType": "CL_ACCUM",
+  "credDefId": "did:web:ca.dev.2060.io?service=anoncreds&relativeRef=/credential-definition/7fvypL5Mpe1no7z1vHkGhgHzPoFjrG6BoYMdhKMT6YZn",
+  "tag": "MyCustomCredentialDefinition",
+  "value": {
+    "publicKeys": {
+      "accumKey": {
+        "z": "1 0BB...386"
+      }
+    },
+    "maxCredNum": 666,
+    "tailsLocation": "https://my.revocations.tails/tailsfile.txt",
+    "tailsHash": "91zvq2cFmBZmHCcLqFyzv7bfehHH5rMhdAG5wTjqy2PE"
+  }
+}

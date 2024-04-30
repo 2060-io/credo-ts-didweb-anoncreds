@@ -17,8 +17,7 @@ import {
   RegisterSchemaOptions,
   RegisterSchemaReturn,
 } from '@credo-ts/anoncreds'
-import { AgentContext, CacheModuleConfig, DidsApi } from '@credo-ts/core'
-import { parse } from 'did-resolver'
+import { AgentContext, CacheModuleConfig, DidsApi, parseDid } from '@credo-ts/core'
 import { parseUrl } from 'query-string'
 import { AnonCredsResourceResolutionResult } from './AnonCredsResourceResolutionResult'
 import { calculateResourceId, verifyResourceId } from './utils'
@@ -35,8 +34,8 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
 
   private cacheSettings: CacheSettings
 
-  public constructor(options: { cacheOptions?: CacheSettings }) {
-    this.cacheSettings = options.cacheOptions ?? { allowCaching: true, cacheDurationInSeconds: 300 }
+  public constructor(options?: { cacheOptions?: CacheSettings }) {
+    this.cacheSettings = options?.cacheOptions ?? { allowCaching: true, cacheDurationInSeconds: 300 }
   }
 
   public async getSchema(agentContext: AgentContext, schemaId: string): Promise<GetSchemaReturn> {
@@ -99,9 +98,9 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
         }
       }
     } catch (error) {
-      agentContext.config.logger.debug(`error: ${error}`)
+      agentContext.config.logger.debug(`Error resolving schema with id ${schemaId}: ${error}`, { error })
       return {
-        resolutionMetadata: { error: 'invalid' },
+        resolutionMetadata: { error: 'invalid', message: error instanceof Error ? error.message : `${error}` },
         schemaMetadata: {},
         schemaId,
       }
@@ -187,8 +186,11 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
         }
       }
     } catch (error) {
+      agentContext.config.logger.debug(`Error resolving schema with id ${credentialDefinitionId}: ${error}`, {
+        error,
+      })
       return {
-        resolutionMetadata: { error: 'invalid' },
+        resolutionMetadata: { error: 'invalid', message: error instanceof Error ? error.message : `${error}` },
         credentialDefinitionMetadata: {},
         credentialDefinitionId,
       }
@@ -279,8 +281,11 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
         }
       }
     } catch (error) {
+      agentContext.config.logger.debug(`Error resolving schema with id ${revocationRegistryDefinitionId}: ${error}`, {
+        error,
+      })
       return {
-        resolutionMetadata: { error: 'invalid' },
+        resolutionMetadata: { error: 'invalid', message: error instanceof Error ? error.message : `${error}` },
         revocationRegistryDefinitionMetadata: {},
         revocationRegistryDefinitionId,
       }
@@ -377,7 +382,7 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
   }
 
   private async parseIdAndFetchResource(agentContext: AgentContext, didUrl: string) {
-    const parsedDid = parse(didUrl)
+    const parsedDid = parseDid(didUrl)
 
     if (!parsedDid) {
       throw new Error(`${didUrl} is not a valid resource identifier`)

@@ -4,7 +4,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "aries-javascript-didweb-anoncreds/*": ["src"]
+      "credo-ts-didweb-anoncreds/*": ["src"]
     }
   },
   "include": ["packages", "./.eslintrc.js", "./jest.config.ts", "./jest.config.base.ts", "types", "test", "samples"],

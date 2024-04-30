@@ -1,0 +1,6 @@
+{
+  "issuerId": "did:web:api.anoncreds.idlab.app:acme",
+  "name": "idlab_demo",
+  "version": "0.0.1",
+  "attrNames": ["id", "name"]
+}
