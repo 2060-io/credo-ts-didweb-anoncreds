@@ -18,7 +18,6 @@ describe('Credential Definition', () => {
   test('resolves credential definition correctly', async () => {
     const resourceId = calculateResourceId(credentialDefinition1)
 
-    console.log(resourceId)
     // did document
     nock('https://ca.dev.2060.io').get('/.well-known/did.json').reply(200, didDocument1)
 
