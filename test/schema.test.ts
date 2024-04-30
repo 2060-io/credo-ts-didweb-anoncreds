@@ -1,6 +1,8 @@
 import { DidWebAnonCredsRegistry } from '../src/anoncreds'
 import didDocument1 from './__fixtures__/did1.json'
+import didDocument2 from './__fixtures__/did2.json'
 import schema1 from './__fixtures__/schema1.json'
+import schemaGtDjznsWvUNPFaLvaBjayZ5UUtM2RCjVDtgDVqbyDkTG from './__fixtures__/GtDjznsWvUNPFaLvaBjayZ5UUtM2RCjVDtgDVqbyDkTG.json'
 import nock, { cleanAll, enableNetConnect } from 'nock'
 import { agent } from './agent'
 import { calculateResourceId } from '../src/anoncreds/utils'
@@ -65,6 +67,47 @@ describe('Schema', () => {
         message: 'Wrong resource Id',
       },
       schemaId: 'did:web:ca.dev.2060.io?service=anoncreds&relativeRef=/schema/1234',
+      schemaMetadata: {},
+    })
+  })
+
+  test('register and resole did document with nested path', async () => {
+    const registry = new DidWebAnonCredsRegistry()
+
+    const result = await registry.registerSchema(agent.context, {
+      options: {},
+      schema: schemaGtDjznsWvUNPFaLvaBjayZ5UUtM2RCjVDtgDVqbyDkTG.resource,
+    })
+
+    expect(result).toMatchObject({
+      schemaState: {
+        state: 'finished',
+        schemaId:
+          'did:web:nnu4z2pauw49.share.zrok.io:paradym-public-metadata:440ef8ba-36f6-4362-bbac-391dc47e2747?service=anoncreds&relativeRef=/schema/GtDjznsWvUNPFaLvaBjayZ5UUtM2RCjVDtgDVqbyDkTG',
+      },
+    })
+
+    // did document
+    nock('https://nnu4z2pauw49.share.zrok.io')
+      .get('/paradym-public-metadata/440ef8ba-36f6-4362-bbac-391dc47e2747/did.json')
+      .reply(200, didDocument2)
+
+      // Get schema
+      .get(
+        `/paradym-public-metadata/440ef8ba-36f6-4362-bbac-391dc47e2747/anoncreds/schema/GtDjznsWvUNPFaLvaBjayZ5UUtM2RCjVDtgDVqbyDkTG`
+      )
+      .reply(200, schemaGtDjznsWvUNPFaLvaBjayZ5UUtM2RCjVDtgDVqbyDkTG)
+
+    const schemaResponse = await registry.getSchema(
+      agent.context,
+      'did:web:nnu4z2pauw49.share.zrok.io:paradym-public-metadata:440ef8ba-36f6-4362-bbac-391dc47e2747?service=anoncreds&relativeRef=/schema/GtDjznsWvUNPFaLvaBjayZ5UUtM2RCjVDtgDVqbyDkTG'
+    )
+
+    expect(schemaResponse).toEqual({
+      resolutionMetadata: {},
+      schema: schemaGtDjznsWvUNPFaLvaBjayZ5UUtM2RCjVDtgDVqbyDkTG.resource,
+      schemaId:
+        'did:web:nnu4z2pauw49.share.zrok.io:paradym-public-metadata:440ef8ba-36f6-4362-bbac-391dc47e2747?service=anoncreds&relativeRef=/schema/GtDjznsWvUNPFaLvaBjayZ5UUtM2RCjVDtgDVqbyDkTG',
       schemaMetadata: {},
     })
   })
