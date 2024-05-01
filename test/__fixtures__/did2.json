@@ -1,0 +1,68 @@
+{
+  "@context": [
+    "https://w3id.org/did/v1",
+    "https://w3id.org/security/suites/x25519-2019/v1",
+    "https://w3id.org/security/suites/jws-2020/v1"
+  ],
+  "id": "did:web:nnu4z2pauw49.share.zrok.io:paradym-public-metadata:440ef8ba-36f6-4362-bbac-391dc47e2747",
+  "verificationMethod": [
+    {
+      "id": "did:web:nnu4z2pauw49.share.zrok.io:paradym-public-metadata:440ef8ba-36f6-4362-bbac-391dc47e2747#z6MkvqQGA2m3YhLUDx9GKVmjiaLS4EoFxUZT6oU3BAMesCLr",
+      "type": "Ed25519VerificationKey2018",
+      "controller": "did:web:nnu4z2pauw49.share.zrok.io:paradym-public-metadata:440ef8ba-36f6-4362-bbac-391dc47e2747",
+      "publicKeyBase58": "HP9DZnWcD9r17TJZdvotsUnSEfXQYbK6QnZ7LtPdwyZU"
+    },
+    {
+      "id": "did:web:nnu4z2pauw49.share.zrok.io:paradym-public-metadata:440ef8ba-36f6-4362-bbac-391dc47e2747#zDnaeWfRfd58DmjUtjYZKFa7BBmAg268D65toArbv3PVuGVvn",
+      "type": "JsonWebKey2020",
+      "controller": "did:web:nnu4z2pauw49.share.zrok.io:paradym-public-metadata:440ef8ba-36f6-4362-bbac-391dc47e2747",
+      "publicKeyJwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "x": "XJjFoh8k1iHMzYa_WPCsUc6hT70KNPDMnqBK3iLtXLc",
+        "y": "5Jtn2iKTUzoQrK8a2-Yc7PDQcguA1mpf8JE1eWWln2A"
+      }
+    },
+    {
+      "id": "did:web:nnu4z2pauw49.share.zrok.io:paradym-public-metadata:440ef8ba-36f6-4362-bbac-391dc47e2747#z6Mkj1x8an2CxEeSyncjBXhczqY9ATRUa7JgAeo3EZtbPUuw",
+      "type": "Ed25519VerificationKey2018",
+      "controller": "did:web:nnu4z2pauw49.share.zrok.io:paradym-public-metadata:440ef8ba-36f6-4362-bbac-391dc47e2747",
+      "publicKeyBase58": "5Zh5zXmmch9ysHn2Vxjn9jz9Lt9dAE4KUdt7QHvaUG8Z"
+    },
+    {
+      "id": "did:web:nnu4z2pauw49.share.zrok.io:paradym-public-metadata:440ef8ba-36f6-4362-bbac-391dc47e2747#z6LSmSFDYb9prkcA1KZqiDPuSNeXQUymiUn4J8Xsx3oDn2Wh",
+      "type": "JsonWebKey2020",
+      "controller": "did:web:nnu4z2pauw49.share.zrok.io:paradym-public-metadata:440ef8ba-36f6-4362-bbac-391dc47e2747",
+      "publicKeyJwk": { "kty": "OKP", "crv": "X25519", "x": "kQNR1agw-aHsBHA1P4iMPPOnPjJs3QKPIrYNQantLGY" }
+    }
+  ],
+  "service": [
+    {
+      "id": "did:web:nnu4z2pauw49.share.zrok.io:paradym-public-metadata:440ef8ba-36f6-4362-bbac-391dc47e2747#didcomm",
+      "serviceEndpoint": "https://l9ifxc8ial1o.share.zrok.io/didcomm",
+      "type": "did-communication",
+      "priority": 0,
+      "recipientKeys": [
+        "did:web:nnu4z2pauw49.share.zrok.io:paradym-public-metadata:440ef8ba-36f6-4362-bbac-391dc47e2747#z6LSmSFDYb9prkcA1KZqiDPuSNeXQUymiUn4J8Xsx3oDn2Wh"
+      ],
+      "routingKeys": [],
+      "accept": ["didcomm/aip2;env=rfc19"]
+    },
+    {
+      "id": "did:web:nnu4z2pauw49.share.zrok.io:paradym-public-metadata:440ef8ba-36f6-4362-bbac-391dc47e2747#anoncreds",
+      "serviceEndpoint": "https://nnu4z2pauw49.share.zrok.io/paradym-public-metadata/440ef8ba-36f6-4362-bbac-391dc47e2747/anoncreds",
+      "type": "AnonCredsRegistry"
+    }
+  ],
+  "authentication": [
+    "did:web:nnu4z2pauw49.share.zrok.io:paradym-public-metadata:440ef8ba-36f6-4362-bbac-391dc47e2747#z6MkvqQGA2m3YhLUDx9GKVmjiaLS4EoFxUZT6oU3BAMesCLr",
+    "did:web:nnu4z2pauw49.share.zrok.io:paradym-public-metadata:440ef8ba-36f6-4362-bbac-391dc47e2747#zDnaeWfRfd58DmjUtjYZKFa7BBmAg268D65toArbv3PVuGVvn"
+  ],
+  "assertionMethod": [
+    "did:web:nnu4z2pauw49.share.zrok.io:paradym-public-metadata:440ef8ba-36f6-4362-bbac-391dc47e2747#z6MkvqQGA2m3YhLUDx9GKVmjiaLS4EoFxUZT6oU3BAMesCLr",
+    "did:web:nnu4z2pauw49.share.zrok.io:paradym-public-metadata:440ef8ba-36f6-4362-bbac-391dc47e2747#zDnaeWfRfd58DmjUtjYZKFa7BBmAg268D65toArbv3PVuGVvn"
+  ],
+  "keyAgreement": [
+    "did:web:nnu4z2pauw49.share.zrok.io:paradym-public-metadata:440ef8ba-36f6-4362-bbac-391dc47e2747#z6LSmSFDYb9prkcA1KZqiDPuSNeXQUymiUn4J8Xsx3oDn2Wh"
+  ]
+}

@@ -1,46 +1,114 @@
-import { AgentConfig, AgentContext, DependencyManager, DidDocument, JsonTransformer } from '@credo-ts/core'
-import { agentDependencies } from '@credo-ts/node'
 import { DidWebAnonCredsRegistry } from '../src/anoncreds'
 import didDocument1 from './__fixtures__/did1.json'
+import didDocument2 from './__fixtures__/did2.json'
+import schema1 from './__fixtures__/schema1.json'
+import schemaGtDjznsWvUNPFaLvaBjayZ5UUtM2RCjVDtgDVqbyDkTG from './__fixtures__/GtDjznsWvUNPFaLvaBjayZ5UUtM2RCjVDtgDVqbyDkTG.json'
+import nock, { cleanAll, enableNetConnect } from 'nock'
+import { agent } from './agent'
+import { calculateResourceId } from '../src/anoncreds/utils'
 
-import { DidsApi } from '@credo-ts/core/build/modules/dids/DidsApi'
+describe('Schema', () => {
+  beforeAll(async () => {
+    await agent.initialize()
+  })
 
-jest.mock('node-fetch')
-import fetch, { Response } from 'node-fetch'
+  afterEach(() => {
+    cleanAll()
+    enableNetConnect()
+  })
 
-jest.mock('@credo-ts/core/build/modules/dids/DidsApi')
-const DidsApiMock = DidsApi as jest.Mock<DidsApi>
-const didsApiMock = new DidsApiMock()
+  test('resolves schema correctly', async () => {
+    const resourceId = calculateResourceId(schema1)
 
-function getAgentContext() {
-  const dependencyManager = new DependencyManager()
+    // did document
+    nock('https://ca.dev.2060.io').get('/.well-known/did.json').reply(200, didDocument1)
 
-  dependencyManager.registerInstance(AgentConfig, new AgentConfig({ label: 'mock' }, agentDependencies))
-  dependencyManager.registerInstance(DidsApi, didsApiMock)
-  const agentContext = new AgentContext({ dependencyManager, contextCorrelationId: 'mock' })
+    // Get schema
+    nock('https://anoncreds.ca.dev.2060.io').get(`/v1/schema/${resourceId}`).reply(200, {
+      resource: schema1,
+      resourceMetadata: {},
+    })
 
-  agentContext.config
-  return agentContext
-}
-
-// TODO: Fix fetch mocking and add tests for other objects
-describe.skip('Schema', () => {
-  test('parses schema id correctly', async () => {
-    //@ts-ignore
-    fetch.mockReturnValue(Promise.resolve(new Response(JSON.stringify(didDocument1))))
-
-    jest.spyOn(didsApiMock, 'resolveDidDocument').mockResolvedValue(JsonTransformer.fromJSON(didDocument1, DidDocument))
-
-    const registry = new DidWebAnonCredsRegistry({})
+    const registry = new DidWebAnonCredsRegistry()
 
     const schemaResponse = await registry.getSchema(
-      getAgentContext(),
-      'did:web:ca.dev.2060.io?service=anoncreds&relativeRef=/schema/1234'
+      agent.context,
+      `did:web:ca.dev.2060.io?service=anoncreds&relativeRef=/schema/${resourceId}`
     )
-    console.log(schemaResponse)
 
-    expect(fetch).toHaveBeenCalledWith('https://anoncreds.ca.dev.2060.io/v1/schema/1234', {
-      method: 'GET',
+    expect(schemaResponse).toEqual({
+      resolutionMetadata: {},
+      schema: schema1,
+      schemaId: `did:web:ca.dev.2060.io?service=anoncreds&relativeRef=/schema/${resourceId}`,
+      schemaMetadata: {},
+    })
+  })
+
+  test('throws error when schema resourceId does not match', async () => {
+    // did document
+    nock('https://ca.dev.2060.io').get('/.well-known/did.json').reply(200, didDocument1)
+
+    // Get schema
+    nock('https://anoncreds.ca.dev.2060.io').get(`/v1/schema/1234`).reply(200, {
+      resource: schema1,
+      resourceMetadata: {},
+    })
+
+    const registry = new DidWebAnonCredsRegistry()
+
+    const schemaResponse = await registry.getSchema(
+      agent.context,
+      `did:web:ca.dev.2060.io?service=anoncreds&relativeRef=/schema/1234`
+    )
+
+    expect(schemaResponse).toEqual({
+      resolutionMetadata: {
+        error: 'invalid',
+        message: 'Wrong resource Id',
+      },
+      schemaId: 'did:web:ca.dev.2060.io?service=anoncreds&relativeRef=/schema/1234',
+      schemaMetadata: {},
+    })
+  })
+
+  test('register and resole did document with nested path', async () => {
+    const registry = new DidWebAnonCredsRegistry()
+
+    const result = await registry.registerSchema(agent.context, {
+      options: {},
+      schema: schemaGtDjznsWvUNPFaLvaBjayZ5UUtM2RCjVDtgDVqbyDkTG.resource,
+    })
+
+    expect(result).toMatchObject({
+      schemaState: {
+        state: 'finished',
+        schemaId:
+          'did:web:nnu4z2pauw49.share.zrok.io:paradym-public-metadata:440ef8ba-36f6-4362-bbac-391dc47e2747?service=anoncreds&relativeRef=/schema/GtDjznsWvUNPFaLvaBjayZ5UUtM2RCjVDtgDVqbyDkTG',
+      },
+    })
+
+    // did document
+    nock('https://nnu4z2pauw49.share.zrok.io')
+      .get('/paradym-public-metadata/440ef8ba-36f6-4362-bbac-391dc47e2747/did.json')
+      .reply(200, didDocument2)
+
+      // Get schema
+      .get(
+        `/paradym-public-metadata/440ef8ba-36f6-4362-bbac-391dc47e2747/anoncreds/schema/GtDjznsWvUNPFaLvaBjayZ5UUtM2RCjVDtgDVqbyDkTG`
+      )
+      .reply(200, schemaGtDjznsWvUNPFaLvaBjayZ5UUtM2RCjVDtgDVqbyDkTG)
+
+    const schemaResponse = await registry.getSchema(
+      agent.context,
+      'did:web:nnu4z2pauw49.share.zrok.io:paradym-public-metadata:440ef8ba-36f6-4362-bbac-391dc47e2747?service=anoncreds&relativeRef=/schema/GtDjznsWvUNPFaLvaBjayZ5UUtM2RCjVDtgDVqbyDkTG'
+    )
+
+    expect(schemaResponse).toEqual({
+      resolutionMetadata: {},
+      schema: schemaGtDjznsWvUNPFaLvaBjayZ5UUtM2RCjVDtgDVqbyDkTG.resource,
+      schemaId:
+        'did:web:nnu4z2pauw49.share.zrok.io:paradym-public-metadata:440ef8ba-36f6-4362-bbac-391dc47e2747?service=anoncreds&relativeRef=/schema/GtDjznsWvUNPFaLvaBjayZ5UUtM2RCjVDtgDVqbyDkTG',
+      schemaMetadata: {},
     })
   })
 })

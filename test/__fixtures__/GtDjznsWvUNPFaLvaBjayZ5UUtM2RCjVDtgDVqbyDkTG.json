@@ -1,0 +1,9 @@
+{
+  "resource": {
+    "attrNames": ["hello"],
+    "name": "a",
+    "issuerId": "did:web:nnu4z2pauw49.share.zrok.io:paradym-public-metadata:440ef8ba-36f6-4362-bbac-391dc47e2747",
+    "version": "1.0"
+  },
+  "resourceMetadata": {}
+}
