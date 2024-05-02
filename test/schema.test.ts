@@ -71,7 +71,40 @@ describe('Schema', () => {
     })
   })
 
-  test('register and resole did document with nested path', async () => {
+  test('throws error when issuerId does not match with did', async () => {
+    const schema = {
+      ...schema1,
+      issuerId: 'random',
+    }
+    const resourceId = calculateResourceId(schema)
+
+    // did document
+    nock('https://ca.dev.2060.io').get('/.well-known/did.json').reply(200, didDocument1)
+
+    // Get schema
+    nock('https://anoncreds.ca.dev.2060.io').get(`/v1/schema/${resourceId}`).reply(200, {
+      resource: schema,
+      resourceMetadata: {},
+    })
+
+    const registry = new DidWebAnonCredsRegistry()
+
+    const schemaResponse = await registry.getSchema(
+      agent.context,
+      `did:web:ca.dev.2060.io?service=anoncreds&relativeRef=/schema/${resourceId}`
+    )
+
+    expect(schemaResponse).toEqual({
+      resolutionMetadata: {
+        error: 'invalid',
+        message: 'issuerId in schema (random) does not match the did (did:web:ca.dev.2060.io)',
+      },
+      schemaId: `did:web:ca.dev.2060.io?service=anoncreds&relativeRef=/schema/${resourceId}`,
+      schemaMetadata: {},
+    })
+  })
+
+  test('register and resolve did document with nested path', async () => {
     const registry = new DidWebAnonCredsRegistry()
 
     const result = await registry.registerSchema(agent.context, {

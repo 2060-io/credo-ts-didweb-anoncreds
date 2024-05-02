@@ -74,4 +74,37 @@ describe('Revocation Registry Definition', () => {
       revocationRegistryDefinitionMetadata: {},
     })
   })
+
+  test('throws error when revocation registry definition resourceId does not match', async () => {
+    const revocationRegistryDefinition = {
+      ...revocationRegistryDefinition1,
+      issuerId: 'random2',
+    }
+
+    const resourceId = calculateResourceId(revocationRegistryDefinition)
+    // did document
+    nock('https://ca.dev.2060.io').get('/.well-known/did.json').reply(200, didDocument1)
+
+    // Get schema
+    nock('https://anoncreds.ca.dev.2060.io').get(`/v1/revocation-registry/${resourceId}`).reply(200, {
+      resource: revocationRegistryDefinition,
+      resourceMetadata: {},
+    })
+
+    const registry = new DidWebAnonCredsRegistry()
+
+    const revocationRegistryDefinitionResponse = await registry.getRevocationRegistryDefinition(
+      agent.context,
+      `did:web:ca.dev.2060.io?service=anoncreds&relativeRef=/revocation-registry/${resourceId}`
+    )
+
+    expect(revocationRegistryDefinitionResponse).toEqual({
+      resolutionMetadata: {
+        error: 'invalid',
+        message: 'issuerId in revocation registry definition (random2) does not match the did (did:web:ca.dev.2060.io)',
+      },
+      revocationRegistryDefinitionId: `did:web:ca.dev.2060.io?service=anoncreds&relativeRef=/revocation-registry/${resourceId}`,
+      revocationRegistryDefinitionMetadata: {},
+    })
+  })
 })

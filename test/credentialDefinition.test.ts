@@ -29,12 +29,12 @@ describe('Credential Definition', () => {
 
     const registry = new DidWebAnonCredsRegistry()
 
-    const schemaResponse = await registry.getCredentialDefinition(
+    const credentialDefinitionResponse = await registry.getCredentialDefinition(
       agent.context,
       `did:web:ca.dev.2060.io?service=anoncreds&relativeRef=/credential-definition/${resourceId}`
     )
 
-    expect(schemaResponse).toEqual({
+    expect(credentialDefinitionResponse).toEqual({
       resolutionMetadata: {},
       credentialDefinition: credentialDefinition1,
       credentialDefinitionId: `did:web:ca.dev.2060.io?service=anoncreds&relativeRef=/credential-definition/${resourceId}`,
@@ -65,6 +65,39 @@ describe('Credential Definition', () => {
         message: 'Wrong resource Id',
       },
       credentialDefinitionId: 'did:web:ca.dev.2060.io?service=anoncreds&relativeRef=/credential-definition/1234',
+      credentialDefinitionMetadata: {},
+    })
+  })
+
+  test('throws error when issuerId does not match with did', async () => {
+    const credentialDefinition = {
+      ...credentialDefinition1,
+      issuerId: 'random',
+    }
+    const resourceId = calculateResourceId(credentialDefinition)
+
+    // did document
+    nock('https://ca.dev.2060.io').get('/.well-known/did.json').reply(200, didDocument1)
+
+    // Get schema
+    nock('https://anoncreds.ca.dev.2060.io').get(`/v1/credential-definition/${resourceId}`).reply(200, {
+      resource: credentialDefinition,
+      resourceMetadata: {},
+    })
+
+    const registry = new DidWebAnonCredsRegistry()
+
+    const credentialDefinitionResponse = await registry.getCredentialDefinition(
+      agent.context,
+      `did:web:ca.dev.2060.io?service=anoncreds&relativeRef=/credential-definition/${resourceId}`
+    )
+
+    expect(credentialDefinitionResponse).toEqual({
+      resolutionMetadata: {
+        error: 'invalid',
+        message: 'issuerId in credential definition (random) does not match the did (did:web:ca.dev.2060.io)',
+      },
+      credentialDefinitionId: `did:web:ca.dev.2060.io?service=anoncreds&relativeRef=/credential-definition/${resourceId}`,
       credentialDefinitionMetadata: {},
     })
   })

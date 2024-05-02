@@ -1,5 +1,5 @@
 {
-  "issuerId": "did:web:api.anoncreds.idlab.app:acme",
+  "issuerId": "did:web:ca.dev.2060.io",
   "name": "idlab_demo",
   "version": "0.0.1",
   "attrNames": ["id", "name"]
