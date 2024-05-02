@@ -59,7 +59,7 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
       }
     }
     try {
-      const { response, resourceId } = await this.parseIdAndFetchResource(agentContext, schemaId)
+      const { response, resourceId, did } = await this.parseIdAndFetchResource(agentContext, schemaId)
 
       if (response.status === 200) {
         const result = (await response.json()) as AnonCredsResourceResolutionResult
@@ -67,6 +67,10 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
         const schemaMetadata = result.resourceMetadata
         if (!verifyResourceId(schema, resourceId)) {
           throw new Error('Wrong resource Id')
+        }
+
+        if (did !== schema.issuerId) {
+          throw new Error(`issuerId in schema (${schema.issuerId}) does not match the did (${did})`)
         }
 
         if (this.cacheSettings.allowCaching) {
@@ -147,7 +151,7 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
     }
 
     try {
-      const { response, resourceId } = await this.parseIdAndFetchResource(agentContext, credentialDefinitionId)
+      const { response, resourceId, did } = await this.parseIdAndFetchResource(agentContext, credentialDefinitionId)
       if (response.status === 200) {
         const result = (await response.json()) as AnonCredsResourceResolutionResult
         const credentialDefinition = result.resource as unknown as AnonCredsCredentialDefinition
@@ -155,6 +159,12 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
 
         if (!verifyResourceId(credentialDefinition, resourceId)) {
           throw new Error('Wrong resource Id')
+        }
+
+        if (did !== credentialDefinition.issuerId) {
+          throw new Error(
+            `issuerId in credential definition (${credentialDefinition.issuerId}) does not match the did (${did})`
+          )
         }
 
         if (this.cacheSettings.allowCaching) {
@@ -242,7 +252,10 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
     }
 
     try {
-      const { response, resourceId } = await this.parseIdAndFetchResource(agentContext, revocationRegistryDefinitionId)
+      const { response, resourceId, did } = await this.parseIdAndFetchResource(
+        agentContext,
+        revocationRegistryDefinitionId
+      )
       if (response.status === 200) {
         const result = (await response.json()) as AnonCredsResourceResolutionResult
         const revocationRegistryDefinition = result.resource as unknown as AnonCredsRevocationRegistryDefinition
@@ -250,6 +263,12 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
 
         if (!verifyResourceId(revocationRegistryDefinition, resourceId)) {
           throw new Error('Wrong resource Id')
+        }
+
+        if (did !== revocationRegistryDefinition.issuerId) {
+          throw new Error(
+            `issuerId in revocation registry definition (${revocationRegistryDefinition.issuerId}) does not match the did (${did})`
+          )
         }
 
         if (this.cacheSettings.allowCaching) {
@@ -320,6 +339,11 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
     try {
       // TODO: use cache to get Revocation Registry Definition data without fetching it again
       const revRegDefResult = await this.getRevocationRegistryDefinition(agentContext, revocationRegistryId)
+      if (!revRegDefResult.revocationRegistryDefinition) {
+        throw new Error(
+          `Error resolving revocation registry definition with id ${revocationRegistryId}. ${revRegDefResult.resolutionMetadata.error} ${revRegDefResult.resolutionMetadata.message}`
+        )
+      }
 
       const baseEndpoint = revRegDefResult.revocationRegistryDefinitionMetadata.statusListEndpoint
 
@@ -335,6 +359,12 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
         const result = (await response.json()) as AnonCredsResourceResolutionResult
         const revocationStatusList = result.resource as unknown as AnonCredsRevocationStatusList
         const revocationStatusListMetadata = result.resourceMetadata
+
+        if (revocationStatusList.issuerId !== revRegDefResult.revocationRegistryDefinition.issuerId) {
+          throw new Error(
+            `issuerId in revocation status list (${revocationStatusList.issuerId}) does not match the issuer in the revocation registry definition (${revRegDefResult.revocationRegistryDefinition.issuerId})`
+          )
+        }
 
         return {
           revocationStatusList,
@@ -427,6 +457,7 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
     return {
       response: await agentContext.config.agentDependencies.fetch(fetchResourceUrl, { method: 'GET' }),
       resourceId,
+      did: parsedDid.did,
     }
   }
 }
