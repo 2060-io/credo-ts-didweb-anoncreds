@@ -34,11 +34,14 @@ jobs:
 
       - name: Check typescript
         run: pnpm types:check
+
   release:
     runs-on: ubuntu-latest
     environment: NPM
     name: Release
     needs: [validate]
+    # Only run on push to main branch
+    if: github.ref == 'refs/heads/main' && github.repository == '2060-io/aries-javascript-didweb-anoncreds' && github.event_name == 'push'
     steps:
       - name: Checkout aries-javascript-didweb-anoncreds
         uses: actions/checkout@v6
