@@ -1,4 +1,4 @@
-import {
+import type {
   AnonCredsCredentialDefinition,
   AnonCredsRegistry,
   AnonCredsRevocationRegistryDefinition,
@@ -17,9 +17,9 @@ import {
   RegisterSchemaOptions,
   RegisterSchemaReturn,
 } from '@credo-ts/anoncreds'
-import { AgentContext, CacheModuleConfig, DidsApi, parseDid } from '@credo-ts/core'
-import { parseUrl } from 'query-string'
-import { AnonCredsResourceResolutionResult } from './AnonCredsResourceResolutionResult'
+import { type AgentContext, CacheModuleConfig, DidsApi, parseDid } from '@credo-ts/core'
+import queryString from 'query-string'
+import type { AnonCredsResourceResolutionResult } from './AnonCredsResourceResolutionResult'
 import { calculateResourceId, verifyResourceId } from './utils'
 
 export interface CacheSettings {
@@ -42,7 +42,7 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
     const cacheKey = `anoncreds:schema:${schemaId}`
 
     if (this.cacheSettings.allowCaching) {
-      const cache = agentContext.dependencyManager.resolve(CacheModuleConfig).cache
+      const cache = agentContext.resolve(CacheModuleConfig).cache
 
       const cachedObject = await cache.get<GetSchemaReturn>(agentContext, cacheKey)
 
@@ -74,7 +74,7 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
         }
 
         if (this.cacheSettings.allowCaching) {
-          const cache = agentContext.dependencyManager.resolve(CacheModuleConfig).cache
+          const cache = agentContext.resolve(CacheModuleConfig).cache
           await cache.set(
             agentContext,
             cacheKey,
@@ -93,13 +93,12 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
           schemaMetadata,
           resolutionMetadata: {},
         }
-      } else {
-        agentContext.config.logger.debug(`response: ${response.status}`)
-        return {
-          resolutionMetadata: { error: 'notFound' },
-          schemaMetadata: {},
-          schemaId,
-        }
+      }
+      agentContext.config.logger.debug(`response: ${response.status}`)
+      return {
+        resolutionMetadata: { error: 'notFound' },
+        schemaMetadata: {},
+        schemaId,
       }
     } catch (error) {
       agentContext.config.logger.debug(`Error resolving schema with id ${schemaId}: ${error}`, { error })
@@ -112,7 +111,7 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
   }
 
   public async registerSchema(
-    agentContext: AgentContext,
+    _agentContext: AgentContext,
     options: RegisterSchemaOptions
   ): Promise<RegisterSchemaReturn> {
     // Nothing to actually do other than generating a schema id
@@ -133,7 +132,7 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
     const cacheKey = `anoncreds:credentialDefinition:${credentialDefinitionId}`
 
     if (this.cacheSettings.allowCaching) {
-      const cache = agentContext.dependencyManager.resolve(CacheModuleConfig).cache
+      const cache = agentContext.resolve(CacheModuleConfig).cache
 
       const cachedObject = await cache.get<GetCredentialDefinitionReturn>(agentContext, cacheKey)
 
@@ -168,7 +167,7 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
         }
 
         if (this.cacheSettings.allowCaching) {
-          const cache = agentContext.dependencyManager.resolve(CacheModuleConfig).cache
+          const cache = agentContext.resolve(CacheModuleConfig).cache
           await cache.set(
             agentContext,
             cacheKey,
@@ -187,13 +186,12 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
           credentialDefinitionMetadata,
           resolutionMetadata: {},
         }
-      } else {
-        agentContext.config.logger.debug(`response: ${response.status}`)
-        return {
-          resolutionMetadata: { error: 'notFound' },
-          credentialDefinitionMetadata: {},
-          credentialDefinitionId,
-        }
+      }
+      agentContext.config.logger.debug(`response: ${response.status}`)
+      return {
+        resolutionMetadata: { error: 'notFound' },
+        credentialDefinitionMetadata: {},
+        credentialDefinitionId,
       }
     } catch (error) {
       agentContext.config.logger.debug(`Error resolving schema with id ${credentialDefinitionId}: ${error}`, {
@@ -208,7 +206,7 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
   }
 
   public async registerCredentialDefinition(
-    agentContext: AgentContext,
+    _agentContext: AgentContext,
     options: RegisterCredentialDefinitionOptions
   ): Promise<RegisterCredentialDefinitionReturn> {
     // Nothing to actually do other than generating a credential definition id
@@ -234,7 +232,7 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
     const cacheKey = `anoncreds:revocationRegistryDefinition:${revocationRegistryDefinitionId}`
 
     if (this.cacheSettings.allowCaching) {
-      const cache = agentContext.dependencyManager.resolve(CacheModuleConfig).cache
+      const cache = agentContext.resolve(CacheModuleConfig).cache
 
       const cachedObject = await cache.get<GetRevocationRegistryDefinitionReturn>(agentContext, cacheKey)
 
@@ -272,7 +270,7 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
         }
 
         if (this.cacheSettings.allowCaching) {
-          const cache = agentContext.dependencyManager.resolve(CacheModuleConfig).cache
+          const cache = agentContext.resolve(CacheModuleConfig).cache
           await cache.set(
             agentContext,
             cacheKey,
@@ -291,13 +289,12 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
           revocationRegistryDefinitionMetadata,
           resolutionMetadata: {},
         }
-      } else {
-        agentContext.config.logger.debug(`response: ${response.status}`)
-        return {
-          resolutionMetadata: { error: 'notFound' },
-          revocationRegistryDefinitionMetadata: {},
-          revocationRegistryDefinitionId,
-        }
+      }
+      agentContext.config.logger.debug(`response: ${response.status}`)
+      return {
+        resolutionMetadata: { error: 'notFound' },
+        revocationRegistryDefinitionMetadata: {},
+        revocationRegistryDefinitionId,
       }
     } catch (error) {
       agentContext.config.logger.debug(`Error resolving schema with id ${revocationRegistryDefinitionId}: ${error}`, {
@@ -312,7 +309,7 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
   }
 
   public async registerRevocationRegistryDefinition(
-    agentContext: AgentContext,
+    _agentContext: AgentContext,
     options: RegisterRevocationRegistryDefinitionOptions
   ): Promise<RegisterRevocationRegistryDefinitionReturn> {
     // Nothing to actually do other than generating a revocation registry definition id
@@ -371,14 +368,13 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
           revocationStatusListMetadata,
           resolutionMetadata: {},
         }
-      } else {
-        agentContext.config.logger.debug(`response: ${response.status}`)
-        return {
-          resolutionMetadata: { error: 'notFound' },
-          revocationStatusListMetadata: {},
-        }
       }
-    } catch (error) {
+      agentContext.config.logger.debug(`response: ${response.status}`)
+      return {
+        resolutionMetadata: { error: 'notFound' },
+        revocationStatusListMetadata: {},
+      }
+    } catch {
       return {
         resolutionMetadata: { error: 'invalid' },
         revocationStatusListMetadata: {},
@@ -391,7 +387,7 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
     options: RegisterRevocationStatusListOptions
   ): Promise<RegisterRevocationStatusListReturn> {
     // Nothing to actually do other than adding a timestamp
-    const timestamp = Math.floor(new Date().getTime() / 1000)
+    const timestamp = Math.floor(Date.now() / 1000)
     const latestRevocationStatusList = await this.getRevocationStatusList(
       agentContext,
       options.revocationStatusList.revRegDefId,
@@ -418,16 +414,16 @@ export class DidWebAnonCredsRegistry implements AnonCredsRegistry {
       throw new Error(`${didUrl} is not a valid resource identifier`)
     }
 
-    if (parsedDid.method != 'web') {
+    if (parsedDid.method !== 'web') {
       throw new Error('DidWebAnonCredsRegistry only supports did:web identifiers')
     }
 
-    const didsApi = agentContext.dependencyManager.resolve(DidsApi)
+    const didsApi = agentContext.resolve(DidsApi)
     const didDocument = await didsApi.resolveDidDocument(parsedDid.did)
 
-    const parsedUrl = parseUrl(didUrl)
-    const queriedService = parsedUrl.query['service']
-    const relativeRef = parsedUrl.query['relativeRef']
+    const parsedUrl = queryString.parseUrl(didUrl)
+    const queriedService = parsedUrl.query.service
+    const relativeRef = parsedUrl.query.relativeRef
 
     if (!queriedService || Array.isArray(queriedService)) {
       throw new Error('No valid service query present in the ID')
