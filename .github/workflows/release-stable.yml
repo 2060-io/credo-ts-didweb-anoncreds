@@ -7,39 +7,14 @@ on:
         description: The type of release. Should be one of "major", "minor", "patch"
         required: true
         default: 'patch'
-  pull_request:
-    branches:
-      - main
 
 permissions:
   id-token: write   # required for npm trusted publishing
 
 jobs:
-  validate:
-    runs-on: ubuntu-latest
-    name: Validate
-    steps:
-      - name: Checkout aries-javascript-didweb-anoncreds
-        uses: actions/checkout@v6
-
-      - uses: pnpm/action-setup@v4
-      - name: Setup node v22
-        uses: actions/setup-node@v6
-        with:
-          node-version: 22
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Formatting
-        run: pnpm style:check
-
-      - name: Check typescript
-        run: pnpm types:check
-
   release:
     runs-on: ubuntu-latest
-    name: Release
+    name: Release Stable
     needs: [validate]
     # Only run on workflow dispatch to main branch
     if: github.ref == 'refs/heads/main' && github.repository == '2060-io/aries-javascript-didweb-anoncreds' && github.event_name == 'workflow_dispatch'
