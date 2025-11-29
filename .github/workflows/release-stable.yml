@@ -19,7 +19,7 @@ jobs:
     # Only run on workflow dispatch to main branch
     if: github.ref == 'refs/heads/main' && github.repository == '2060-io/aries-javascript-didweb-anoncreds' && github.event_name == 'workflow_dispatch'
     steps:
-      - name: Checkout aries-javascript-didweb-anoncreds
+      - name: Checkout credo-ts-didweb-anoncreds
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
