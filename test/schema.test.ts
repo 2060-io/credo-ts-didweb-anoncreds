@@ -1,11 +1,12 @@
+import nock, { cleanAll, enableNetConnect } from 'nock'
+import { afterEach, beforeAll, describe, expect, test } from 'vitest'
 import { DidWebAnonCredsRegistry } from '../src/anoncreds'
+import { calculateResourceId } from '../src/anoncreds/utils'
 import didDocument1 from './__fixtures__/did1.json'
 import didDocument2 from './__fixtures__/did2.json'
-import schema1 from './__fixtures__/schema1.json'
 import schemaGtDjznsWvUNPFaLvaBjayZ5UUtM2RCjVDtgDVqbyDkTG from './__fixtures__/GtDjznsWvUNPFaLvaBjayZ5UUtM2RCjVDtgDVqbyDkTG.json'
-import nock, { cleanAll, enableNetConnect } from 'nock'
+import schema1 from './__fixtures__/schema1.json'
 import { agent } from './agent'
-import { calculateResourceId } from '../src/anoncreds/utils'
 
 describe('Schema', () => {
   beforeAll(async () => {
@@ -49,7 +50,7 @@ describe('Schema', () => {
     nock('https://ca.dev.2060.io').get('/.well-known/did.json').reply(200, didDocument1)
 
     // Get schema
-    nock('https://anoncreds.ca.dev.2060.io').get(`/v1/schema/1234`).reply(200, {
+    nock('https://anoncreds.ca.dev.2060.io').get('/v1/schema/1234').reply(200, {
       resource: schema1,
       resourceMetadata: {},
     })
@@ -58,7 +59,7 @@ describe('Schema', () => {
 
     const schemaResponse = await registry.getSchema(
       agent.context,
-      `did:web:ca.dev.2060.io?service=anoncreds&relativeRef=/schema/1234`
+      'did:web:ca.dev.2060.io?service=anoncreds&relativeRef=/schema/1234'
     )
 
     expect(schemaResponse).toEqual({
@@ -127,7 +128,7 @@ describe('Schema', () => {
 
       // Get schema
       .get(
-        `/paradym-public-metadata/440ef8ba-36f6-4362-bbac-391dc47e2747/anoncreds/schema/GtDjznsWvUNPFaLvaBjayZ5UUtM2RCjVDtgDVqbyDkTG`
+        '/paradym-public-metadata/440ef8ba-36f6-4362-bbac-391dc47e2747/anoncreds/schema/GtDjznsWvUNPFaLvaBjayZ5UUtM2RCjVDtgDVqbyDkTG'
       )
       .reply(200, schemaGtDjznsWvUNPFaLvaBjayZ5UUtM2RCjVDtgDVqbyDkTG)
 

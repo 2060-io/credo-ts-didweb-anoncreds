@@ -1,9 +1,10 @@
-import { DidWebAnonCredsRegistry } from '../src/anoncreds'
-import didDocument1 from './__fixtures__/did1.json'
-import credentialDefinition1 from './__fixtures__/credentialDefinition1.json'
 import nock, { cleanAll, enableNetConnect } from 'nock'
-import { agent } from './agent'
+import { afterEach, beforeAll, describe, expect, test } from 'vitest'
+import { DidWebAnonCredsRegistry } from '../src/anoncreds'
 import { calculateResourceId } from '../src/anoncreds/utils'
+import credentialDefinition1 from './__fixtures__/credentialDefinition1.json'
+import didDocument1 from './__fixtures__/did1.json'
+import { agent } from './agent'
 
 describe('Credential Definition', () => {
   beforeAll(async () => {
@@ -47,7 +48,7 @@ describe('Credential Definition', () => {
     nock('https://ca.dev.2060.io').get('/.well-known/did.json').reply(200, didDocument1)
 
     // Get schema
-    nock('https://anoncreds.ca.dev.2060.io').get(`/v1/credential-definition/1234`).reply(200, {
+    nock('https://anoncreds.ca.dev.2060.io').get('/v1/credential-definition/1234').reply(200, {
       resource: credentialDefinition1,
       resourceMetadata: {},
     })
@@ -56,7 +57,7 @@ describe('Credential Definition', () => {
 
     const credentialDefinitionResponse = await registry.getCredentialDefinition(
       agent.context,
-      `did:web:ca.dev.2060.io?service=anoncreds&relativeRef=/credential-definition/1234`
+      'did:web:ca.dev.2060.io?service=anoncreds&relativeRef=/credential-definition/1234'
     )
 
     expect(credentialDefinitionResponse).toEqual({
