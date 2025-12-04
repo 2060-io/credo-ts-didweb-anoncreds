@@ -1,4 +1,4 @@
-name: Continuous Deployment
+name: Release Stable
 
 on:
   workflow_dispatch:
@@ -15,7 +15,6 @@ jobs:
   release:
     runs-on: ubuntu-latest
     name: Release Stable
-    needs: [validate]
     # Only run on workflow dispatch to main branch
     if: github.ref == 'refs/heads/main' && github.repository == '2060-io/credo-ts-didweb-anoncreds' && github.event_name == 'workflow_dispatch'
     steps:
@@ -53,7 +52,7 @@ jobs:
       - name: Build the library
         run: pnpm build
 
-      - name: Release unstable
+      - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm release ${{ github.event.inputs.releaseType }} --ci
