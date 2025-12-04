@@ -17,7 +17,7 @@ jobs:
     name: Release Stable
     needs: [validate]
     # Only run on workflow dispatch to main branch
-    if: github.ref == 'refs/heads/main' && github.repository == '2060-io/aries-javascript-didweb-anoncreds' && github.event_name == 'workflow_dispatch'
+    if: github.ref == 'refs/heads/main' && github.repository == '2060-io/credo-ts-didweb-anoncreds' && github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout credo-ts-didweb-anoncreds
         uses: actions/checkout@v6
