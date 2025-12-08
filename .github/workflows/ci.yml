@@ -8,15 +8,12 @@ on:
     branches:
       - main
 
-permissions:
-  id-token: write   # required for npm trusted publishing
-
 jobs:
   validate:
     runs-on: ubuntu-latest
     name: Validate
     steps:
-      - name: Checkout aries-javascript-didweb-anoncreds
+      - name: Checkout credo-ts-didweb-anoncreds
         uses: actions/checkout@v6
 
       - uses: pnpm/action-setup@v4
@@ -34,47 +31,3 @@ jobs:
 
       - name: Check typescript
         run: pnpm types:check
-
-  release-unstable:
-    runs-on: ubuntu-latest
-    environment: NPM
-    name: Release Unstable
-    needs: [validate]
-    # Only run on push to main branch
-    if: github.ref == 'refs/heads/main' && github.repository == '2060-io/aries-javascript-didweb-anoncreds' && github.event_name == 'push'
-    steps:
-      - name: Checkout aries-javascript-didweb-anoncreds
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: git config
-        run: |
-          git config user.name "@github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      - uses: pnpm/action-setup@v4
-      - name: Setup node v22
-        uses: actions/setup-node@v6
-        with:
-          node-version: 22
-          cache: pnpm
-          registry-url: 'https://registry.npmjs.org'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      # anchor to the smallest npm version supporting trusted publishing
-      - name: Update npm
-        run: npm install -g npm@^11
-
-      - name: Build the library
-        run: pnpm build
-
-      - name: Release unstable
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm release --preRelease alpha --ci
