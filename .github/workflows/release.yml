@@ -68,7 +68,7 @@ jobs:
     # Only run on push to main branch
     if: github.ref == 'refs/heads/main' && github.repository == '2060-io/credo-ts-didweb-anoncreds' && github.event_name == 'push'
     steps:
-      - name: Checkout aries-javascript-didweb-anoncreds
+      - name: Checkout credo-ts-didweb-anoncreds
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
