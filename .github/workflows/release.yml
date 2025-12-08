@@ -89,9 +89,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
       # anchor to the smallest npm version supporting trusted publishing
       - name: Update npm
         run: npm install -g npm@^11
