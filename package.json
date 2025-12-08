@@ -40,17 +40,17 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.7",
-    "@credo-ts/anoncreds": "0.6.0-alpha-20251127043254",
-    "@credo-ts/askar": "0.6.0-alpha-20251127043254",
-    "@credo-ts/core": "0.6.0-alpha-20251127043254",
-    "@credo-ts/node": "0.6.0-alpha-20251127043254",
+    "@credo-ts/anoncreds": "^0.6.0",
+    "@credo-ts/askar": "^0.6.0",
+    "@credo-ts/core": "^0.6.0",
+    "@credo-ts/node": "^0.6.0",
     "@openwallet-foundation/askar-nodejs": "^0.4.3",
     "nock": "^14.0.10",
     "release-it": "^17.0.1",
     "tsconfig-paths": "^3.10.1",
+    "tsdown": "^0.16.7",
     "typescript": "~5.9.3",
-    "vitest": "^4.0.7",
-    "tsdown": "^0.16.7"
+    "vitest": "^4.0.7"
   },
   "peerDependencies": {
     "@credo-ts/anoncreds": "^0.6.0",
@@ -64,10 +64,15 @@
     "github": {
       "release": true
     },
+    "hooks": {
+      "before:npm:release": "pnpm pack"
+    },
     "npm": {
       "skipChecks": true,
       "ignoreVersion": true,
-      "tag": "latest"
+      "tag": "latest",
+      "publish": true,
+      "publishPath": "*.tgz"
     },
     "git": {
       "push": false,
