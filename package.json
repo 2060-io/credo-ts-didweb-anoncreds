@@ -29,11 +29,11 @@
     "access": "public",
     "registry": "https://registry.npmjs.org/",
     "module": "./build/index.mjs",
-    "types": "./dist/index.d.mts",
+    "types": "./build/index.d.mts",
     "exports": {
       ".": {
-        "import": "./dist/index.mjs",
-        "types": "./dist/index.d.mts"
+        "import": "./build/index.mjs",
+        "types": "./build/index.d.mts"
       },
       "./package.json": "./package.json"
     }
