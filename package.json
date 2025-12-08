@@ -46,7 +46,7 @@
     "@credo-ts/node": "^0.6.0",
     "@openwallet-foundation/askar-nodejs": "^0.4.3",
     "nock": "^14.0.10",
-    "release-it": "^17.0.1",
+    "release-it": "^19.0.6",
     "tsconfig-paths": "^3.10.1",
     "tsdown": "^0.16.7",
     "typescript": "~5.9.3",
