@@ -32,8 +32,9 @@
     "types": "./build/index.d.mts",
     "exports": {
       ".": {
+        "types": "./build/index.d.mts",
         "import": "./build/index.mjs",
-        "types": "./build/index.d.mts"
+        "default": "./build/index.mjs"
       },
       "./package.json": "./package.json"
     }
