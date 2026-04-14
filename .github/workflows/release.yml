@@ -37,7 +37,7 @@ jobs:
       - name: Setup node v22
         uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: '22.14.0'
           cache: pnpm
           registry-url: 'https://registry.npmjs.org'
 
@@ -46,7 +46,9 @@ jobs:
 
       # anchor to the smallest npm version supporting trusted publishing
       - name: Update npm
-        run: npm install -g npm@^11
+        run: |
+          npm install -g npm@11.11.0
+          corepack enable
 
       - name: Set Verbose Logging
         run: npm config set loglevel verbose --global
@@ -82,7 +84,7 @@ jobs:
       - name: Setup node v22
         uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: '22.14.0'
           cache: pnpm
           registry-url: 'https://registry.npmjs.org'
 
@@ -91,7 +93,9 @@ jobs:
 
       # anchor to the smallest npm version supporting trusted publishing
       - name: Update npm
-        run: npm install -g npm@^11
+        run: |
+          npm install -g npm@11.11.0
+          corepack enable
 
       - name: Build the library
         run: pnpm build
